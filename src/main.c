@@ -76,7 +76,7 @@ void send_temperature(int temperature) {
 				if (send_buf[i] != '\0') {
 					serial_send(send_buf[i]);
 				}
-        
+
     }
 }
 
@@ -97,21 +97,42 @@ void UARTInterrupt(void) interrupt 4 {
         RI = 0;
 
         r_buf = SBUF;
-        if(r_buf == '1') {
-					// reset
-					init_sht3x();
-					delay_sometime(50);
-					init_serial();
-					delay_sometime(50);
-					connection = CONNECTED_AND_RUNNING;
-        } else if(r_buf == '2') {
-					// reset
-					init_sht3x();
-					delay_sometime(50);
-					init_serial();
-					delay_sometime(50);
-					connection = CONNECTED_AND_HALTED;
-        }
+        if (r_buf == 'c') { //control
+            r_buf = SBUF;
+            if(r_buf == '1') {
+                // reset
+                init_sht3x();
+                delay_sometime(50);
+                init_serial();
+                delay_sometime(50);
+                connection = CONNECTED_AND_RUNNING;
+            } else if(r_buf == '2') {
+                // reset
+                init_sht3x();
+                delay_sometime(50);
+                init_serial();
+                delay_sometime(50);
+                connection = CONNECTED_AND_HALTED;
+            }
+        } else if (r_buf == 'd') { //data
+            // datetime format:
+            // "%Y%m%d%H%M%S"
+            uint8 year = 2020; // 4
+            uint8 month = 0; // 2
+            uint8 day = 0; // 2
+            uint8 hour = 0; // 2
+            uint8 minute = 0; // 2
+            uint8 second = 0; // 2
+
+            uint8 time_array[14];
+            uint8 i = 0;
+            for (i=0;i<14;i++) {
+                r_buf = SBUF;
+                time_array[i] = r_buf - '0';
+            }
+            year  = time_array[0]*1000 + time_array[1]*100 + time_array[2]*10 + time_array[3];
+
+        
     }
 }
 
